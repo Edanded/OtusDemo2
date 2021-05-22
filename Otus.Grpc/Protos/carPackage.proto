@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option csharp_namespace = "Otus.Grpc";
+
+package carPackage;
+
+// The greeting service definition.
+service CarProvider {
+  // Sends a greeting
+  rpc GetCar (CarRequest) returns (CarReply);
+}
+
+// Тип кузова
+enum BodyType {
+  NONE = 0;
+  SEDAN = 1;
+  STATION_WAGON = 2;
+  LIFTBACK = 3;
+}
+
+message Document{
+  int32 id = 1;
+  string name = 2;
+  string comment = 3;
+}
+
+// Запрос
+message CarRequest {
+  int64 id = 1;
+
+  
+}
+
+
+
+// The response message containing the greetings.
+message CarReply {
+  int64 id = 1;
+  string name = 2;
+  Document documents = 3;
+  BodyType bodyType = 4;
+  string color = 5; 
+}

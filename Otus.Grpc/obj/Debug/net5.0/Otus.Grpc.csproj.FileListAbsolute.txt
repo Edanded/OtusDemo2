@@ -1,0 +1,2 @@
+C:\Users\Эдгар\Documents\otus\демо\демо 2\code\Otus.Grpc\obj\Debug\net5.0\Otus.Grpc.csprojAssemblyReference.cache
+C:\Users\Эдгар\Documents\otus\демо\демо 2\code\Otus.Grpc\obj\Debug\net5.0\Otus.Grpc.GeneratedMSBuildEditorConfig.editorconfig
