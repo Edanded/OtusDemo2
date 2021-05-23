@@ -9,13 +9,11 @@ const Home = () => {
   const [isAuth, setIsAuth] = React.useState<boolean>(false);
   const [login, setLogin] = React.useState<string | undefined>(undefined);
   
-
-
-
-
   const onSubmitLogin = (data: any) => {
     setIsAuth(true);
   };
+
+  console.log('fff');
 
   const loginBlock = () => {
     return <>

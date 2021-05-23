@@ -694,7 +694,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Эдгар\\.nuget\\packages\\": {},
+    "c:\\nugetpackages": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
@@ -703,7 +703,7 @@
       "projectUniqueName": "C:\\Users\\Эдгар\\Documents\\otus\\демо\\демо 2\\code\\Otus.Grpc\\Otus.Grpc.csproj",
       "projectName": "Otus.Grpc",
       "projectPath": "C:\\Users\\Эдгар\\Documents\\otus\\демо\\демо 2\\code\\Otus.Grpc\\Otus.Grpc.csproj",
-      "packagesPath": "C:\\Users\\Эдгар\\.nuget\\packages\\",
+      "packagesPath": "c:\\nugetpackages",
       "outputPath": "C:\\Users\\Эдгар\\Documents\\otus\\демо\\демо 2\\code\\Otus.Grpc\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [

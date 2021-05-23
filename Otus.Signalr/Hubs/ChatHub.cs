@@ -3,53 +3,40 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Otus.Signalr.Models;
 
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
+
 namespace Otus.Signalr.Hubs
 {
     public interface IChatClient
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         Task ReceiveMessage(ChatMessage message);
     }
-    // public class ChatHub : Hub<IChatClient>
-    // {
 
-    //     public async Task SendMessage(ChatMessage m)
-    //     {
-
-    //         var user=m.To;
-    //         var message=m.Message;
-    //         if (string.IsNullOrWhiteSpace(user))
-    //         {
-    //             Console.WriteLine("fafafa");
-    //             await Clients.All.ReceiveMessage( m);
-    //         }
-    //         else
-    //         {
-    //             await Clients.User(user).ReceiveMessage(m);
-    //         }
-
-    //     }
-    // }
-
-
-
-
-
-
-    public class ChatHub : Hub
+    public class ChatHub : Hub<IChatClient>
     {
+
         public async Task SendMessage(ChatMessage m)
         {
-            var user = m.To;
-            var message = m.Message;
-            if (string.IsNullOrWhiteSpace(user))
-            {
-                await Clients.All.SendAsync("ReceiveMessage", m);
-            }
-            else
-            {
-                await Clients.User(user).SendAsync("ReceiveMessage", m);
-            }
 
+             await Clients.All.ReceiveMessage( m);
         }
     }
+
+
+     public class SignalUserProvider : IUserIdProvider
+    {
+        public string GetUserId(HubConnectionContext connection)
+        {
+            return "fa";
+            var s= connection.GetHttpContext().Request.Headers["X-Dummy-Auth"][0];
+            return s;
+        }
+    }
+
 }

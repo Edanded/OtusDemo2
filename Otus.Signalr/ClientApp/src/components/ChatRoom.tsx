@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import {  HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
 class ChatMessage {
     message?: string;
@@ -15,8 +15,13 @@ export class Props {
 const ChatRoom = (props: Props) => {
     const { login } = props;
     const [chatHistory, setChatHistory] = React.useState<ChatMessage[]>([]);
-    const [connection, setConnection] = React.useState<HubConnection | undefined>(undefined);
+    const [connection, setConnection] = React.useState<HubConnection | null>(null);
     const [message, setMessage] = React.useState<string>('');
+
+    const latestChat = React.useRef(null);
+
+    (latestChat as any).current = chatHistory;
+
     const st = {
         display: 'block',
         width: '400px',
@@ -27,21 +32,25 @@ const ChatRoom = (props: Props) => {
 
     React.useEffect(() => {
         const newConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5000/hubs/chat')
+            .withUrl('http://localhost:5000/hubs/chat', 
+                { 
+                    headers: { 'X-Dummy-Auth': login }, 
+                transport:HttpTransportType.WebSockets,
+                accessTokenFactory: () => login,
+                skipNegotiation: true, })
+            
             .withAutomaticReconnect() // Если отвалилось соединение - пытаемся еще раз
             .build();
 
         setConnection(newConnection);
-    }, []);
 
-    React.useEffect(() => {
-        if (connection) {
-            connection.start()
+
+        if (newConnection) {
+            newConnection.start()
                 .then(() => {
-       
-
-                    connection.on('ReceiveMessage', message => {
-                        const updatedChat = [...chatHistory];
+                    newConnection.on('ReceiveMessage', message => {
+                        
+                        const updatedChat = [...(latestChat as any).current];
                         updatedChat.push(message);
 
                         setChatHistory(updatedChat);
@@ -49,26 +58,25 @@ const ChatRoom = (props: Props) => {
                 })
                 .catch(e => console.log('Ошибка подключения: ', e));
         }
-    }, [connection]);
-
+    }, []);
 
 
     const textChange = (ev: any) => {
-        //setMessage(ev.target.value);
+        setMessage(ev.target.value);
     };
 
     const sendMessage = async () => {
-
         await connection!.send('SendMessage', { message, login, timestamp: new Date() });
-
     };
 
     return <>
         <div style={st}>{chatHistory.map(x => {
             return <>
-                <i>{x.login}</i>{x.timestamp}
+            <div  key={Date.now() * Math.random()}>
+                <i>{x.login}</i> {x.timestamp}
                 <br />
                 <span>{x.message || ''}</span>
+                </div>
             </>;
 
         })}</div>

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Otus.Grpc
 {
-    public class GreeterService : Greeter.GreeterBase
+    public class GreeterService : CarProvider.CarProviderBase
     {
         private readonly ILogger<GreeterService> _logger;
         public GreeterService(ILogger<GreeterService> logger)
@@ -15,12 +15,21 @@ namespace Otus.Grpc
             _logger = logger;
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        public override Task<CarReply> GetCar(CarRequest request, Grpc.Core.ServerCallContext context)
         {
-            return Task.FromResult(new HelloReply
-            {
-                Message = "Hello " + request.Name
-            });
+            var r=new CarReply();
+            var f=r.Documents;
+        
+            return base.GetCar(request, context);
         }
+
+
+        // public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        // {
+        //     return Task.FromResult(new HelloReply
+        //     {
+        //         Message = "Hello " + request.Name
+        //     });
+        // }
     }
 }
