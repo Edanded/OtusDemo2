@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {  HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
 class ChatMessage {
     message?: string;
@@ -9,14 +9,16 @@ class ChatMessage {
 
 export class Props {
     login!: string;
+    token!: string;
 }
 
 
 const ChatRoom = (props: Props) => {
-    const { login } = props;
+    const { login, token } = props;
     const [chatHistory, setChatHistory] = React.useState<ChatMessage[]>([]);
     const [connection, setConnection] = React.useState<HubConnection | null>(null);
     const [message, setMessage] = React.useState<string>('');
+    const [to, setTo] = React.useState<string>('');
 
     const latestChat = React.useRef(null);
 
@@ -32,13 +34,13 @@ const ChatRoom = (props: Props) => {
 
     React.useEffect(() => {
         const newConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5000/hubs/chat', 
-                { 
-                    headers: { 'X-Dummy-Auth': login }, 
-                transport:HttpTransportType.WebSockets,
-                accessTokenFactory: () => login,
-                skipNegotiation: true, })
-            
+            .withUrl('http://localhost:5000/hubs/chat',
+                {
+                    // headers: { 'Foo': 'fafa' },
+                     transport: HttpTransportType.WebSockets,
+                     accessTokenFactory: () => token,
+                  
+                })
             .withAutomaticReconnect() // Если отвалилось соединение - пытаемся еще раз
             .build();
 
@@ -49,7 +51,7 @@ const ChatRoom = (props: Props) => {
             newConnection.start()
                 .then(() => {
                     newConnection.on('ReceiveMessage', message => {
-                        
+
                         const updatedChat = [...(latestChat as any).current];
                         updatedChat.push(message);
 
@@ -66,23 +68,30 @@ const ChatRoom = (props: Props) => {
     };
 
     const sendMessage = async () => {
-        await connection!.send('SendMessage', { message, login, timestamp: new Date() });
+        await connection!.send('SendMessage', { message, login, timestamp: new Date(), to });
     };
+
+    
+  const onReceiverChange = (ev: any) => {
+    setTo(ev.currentTarget.value);
+  };
 
     return <>
         <div style={st}>{chatHistory.map(x => {
             return <>
-            <div  key={Date.now() * Math.random()}>
-                <i>{x.login}</i> {x.timestamp}
-                <br />
-                <span>{x.message || ''}</span>
+                <div key={Date.now() * Math.random()}>
+                    <i>{x.login}</i> {x.timestamp}
+                    <br />
+                    <span>{x.message || ''}</span>
                 </div>
             </>;
 
         })}</div>
-        <textarea onChange={textChange}>
+        <textarea onChange={textChange}
+        style={{display:'block', width:'100'}}>
 
         </textarea>
+        <input type="text" placeholder="Конкретный получатель" onChange={onReceiverChange}/>
         <button onClick={sendMessage}>Отправить</button>
     </>;
 

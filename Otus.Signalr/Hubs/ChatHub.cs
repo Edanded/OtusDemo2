@@ -2,10 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Otus.Signalr.Models;
-
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
-
 namespace Otus.Signalr.Hubs
 {
     public interface IChatClient
@@ -18,24 +15,31 @@ namespace Otus.Signalr.Hubs
         Task ReceiveMessage(ChatMessage message);
     }
 
+    [Authorize]
     public class ChatHub : Hub<IChatClient>
     {
 
         public async Task SendMessage(ChatMessage m)
         {
-
-             await Clients.All.ReceiveMessage( m);
+            if (string.IsNullOrWhiteSpace(m.To))
+            {
+                await Clients.All.ReceiveMessage(m);
+            }
+            else
+            {
+                await Clients.User(m.To).ReceiveMessage(m);
+                await Clients.User(m.Login).ReceiveMessage(m);
+            }
         }
     }
 
 
-     public class SignalUserProvider : IUserIdProvider
+    public class SignalUserProvider : IUserIdProvider
     {
         public string GetUserId(HubConnectionContext connection)
         {
-            return "fa";
-            var s= connection.GetHttpContext().Request.Headers["X-Dummy-Auth"][0];
-            return s;
+            var user = connection.GetHttpContext().User?.Identity?.Name;
+            return user;
         }
     }
 

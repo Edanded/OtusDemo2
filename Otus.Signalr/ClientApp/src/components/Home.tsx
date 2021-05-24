@@ -1,37 +1,39 @@
 
+import axios from 'axios';
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { ApplicationState } from '../store';
 import ChatRoom from './ChatRoom';
 
-const Home = () => {
+const Home: React.FC<any> = () => {
 
-  const [isAuth, setIsAuth] = React.useState<boolean>(false);
   const [login, setLogin] = React.useState<string | undefined>(undefined);
-  
-  const onSubmitLogin = (data: any) => {
+  const [token, setToken] = React.useState<string | undefined>(undefined);
+  const [isAuth, setIsAuth] = React.useState<boolean>(false);
+
+  const onSubmitLogin = async (ev: any) => {
+    ev.preventDefault();
+    const data = await axios.post<string>('http://localhost:5000/api/chat/login', { login: login });
+    setToken(data.data);
     setIsAuth(true);
   };
 
-  console.log('fff');
+  const onLoginChange = (ev: any) => {
+    setLogin(ev.currentTarget.value);
+  };
 
   const loginBlock = () => {
     return <>
       <form onSubmit={onSubmitLogin}>
         <label style={{ display: 'block' }}>Введите логин</label>
-        <input type="text" onChange={(ev) => setLogin(ev.target.value)} />
+        <input type="text" onChange={onLoginChange} />
         <input type="submit" value="Войти" />
       </form>
     </>;
   };
 
-
-
-
-
-
-  return !isAuth ? loginBlock() : <ChatRoom login={login!}/>;
+  return !isAuth ?
+    loginBlock() :
+    <ChatRoom token={token!} login={login!} />;
 
 };
 
-export default connect((state: ApplicationState) => state.isAuthenticated)(Home);
+export default Home;
