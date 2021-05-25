@@ -18,28 +18,21 @@ const ChatRoom = (props: Props) => {
     const [chatHistory, setChatHistory] = React.useState<ChatMessage[]>([]);
     const [connection, setConnection] = React.useState<HubConnection | null>(null);
     const [message, setMessage] = React.useState<string>('');
-    const [to, setTo] = React.useState<string>('');
 
     const latestChat = React.useRef(null);
 
     (latestChat as any).current = chatHistory;
 
-    const st = {
-        display: 'block',
-        width: '400px',
-        height: '400px',
-        border: '1px solid green',
-
-    };
-
     React.useEffect(() => {
+        document.title = `Логин: ${login}`;
+
+
         const newConnection = new HubConnectionBuilder()
             .withUrl('http://localhost:5000/hubs/chat',
                 {
-                    // headers: { 'Foo': 'fafa' },
-                     transport: HttpTransportType.WebSockets,
-                     accessTokenFactory: () => token,
-                  
+                    transport: HttpTransportType.WebSockets,
+                    accessTokenFactory: () => token,
+
                 })
             .withAutomaticReconnect() // Если отвалилось соединение - пытаемся еще раз
             .build();
@@ -68,30 +61,33 @@ const ChatRoom = (props: Props) => {
     };
 
     const sendMessage = async () => {
-        await connection!.send('SendMessage', { message, login, timestamp: new Date(), to });
+        await connection!.send('SendMessage', { message, login, timestamp: new Date() });
     };
 
-    
-  const onReceiverChange = (ev: any) => {
-    setTo(ev.currentTarget.value);
-  };
-
     return <>
-        <div style={st}>{chatHistory.map(x => {
+        <div style={{
+        display: 'block',
+        width: '400px',
+        height: '400px',
+        overflowY: 'scroll',
+        border: '1px solid green',
+
+    }}>{chatHistory.map(x => {
             return <>
                 <div key={Date.now() * Math.random()}>
                     <i>{x.login}</i> {x.timestamp}
                     <br />
                     <span>{x.message || ''}</span>
+                    <br />
+                    <br />
                 </div>
             </>;
 
         })}</div>
         <textarea onChange={textChange}
-        style={{display:'block', width:'100'}}>
+            style={{ display: 'block', width: '100' }}>
 
         </textarea>
-        <input type="text" placeholder="Конкретный получатель" onChange={onReceiverChange}/>
         <button onClick={sendMessage}>Отправить</button>
     </>;
 

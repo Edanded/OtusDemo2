@@ -21,26 +21,7 @@ namespace Otus.Signalr.Hubs
 
         public async Task SendMessage(ChatMessage m)
         {
-            if (string.IsNullOrWhiteSpace(m.To))
-            {
-                await Clients.All.ReceiveMessage(m);
-            }
-            else
-            {
-                await Clients.User(m.To).ReceiveMessage(m);
-                await Clients.User(m.Login).ReceiveMessage(m);
-            }
+            await Clients.All.ReceiveMessage(m);
         }
     }
-
-
-    public class SignalUserProvider : IUserIdProvider
-    {
-        public string GetUserId(HubConnectionContext connection)
-        {
-            var user = connection.GetHttpContext().User?.Identity?.Name;
-            return user;
-        }
-    }
-
 }

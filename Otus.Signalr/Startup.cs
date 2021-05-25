@@ -44,10 +44,6 @@ namespace Otus.Signalr
             // Добавляем SignalR
             services.AddSignalR();
 
-
-            services.AddSingleton<IUserIdProvider, SignalUserProvider>();
-
-
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
